@@ -11,5 +11,11 @@
     ```
 4. Заполнить начальными данными:
     ```
-    bin/console ???
+    bin/console doctrine:fixtures:load 
     ```
+5. Собрать фронтенд статику
+    ```
+    yarn install
+    yarn build
+    ```
+    

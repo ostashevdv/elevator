@@ -6,6 +6,7 @@
 namespace App\Controller;
 
 
+use App\Entity\Elevator;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -17,7 +18,8 @@ class ElevatorController extends Controller
      */
     public function index(): Response
     {
-        return $this->getMockResponse(__METHOD__);
+        $elevators = $this->getDoctrine()->getRepository(Elevator::class)->findAll();
+        return $this->render('elevator/index.html.twig', ['elevators' => $elevators]);
     }
 
     /**

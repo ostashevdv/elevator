@@ -1,0 +1,31 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <!--elevator list:BEGIN-->
+    <h2>Состояние лифтов: </h2>
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Статус</th>
+            <th scope="col">Этаж</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for i, elevator in elevators %}
+
+            {% set class = ['table-success'] %}
+            {% if elevator.isMoving %}
+                {% set class = ['table-secondary'] %}
+            {% endif %}
+
+            <tr class="{{ class | join }}">
+                <th scope="row">{{ elevator.id }}</th>
+                <td>{{ elevator.isMoving }}</td>
+                <td>{{ elevator.currentFloor }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <!--/elevator list:END-->
+{% endblock %}
