@@ -5,6 +5,7 @@ namespace App\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
+ * @ORM\Table(name="`order`")
  * @ORM\Entity(repositoryClass="App\Repository\OrderRepository")
  */
 class Order
