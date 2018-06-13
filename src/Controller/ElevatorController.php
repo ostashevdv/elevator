@@ -7,6 +7,7 @@ namespace App\Controller;
 
 
 use App\Entity\Elevator;
+use App\Entity\Order;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -19,7 +20,9 @@ class ElevatorController extends Controller
     public function index(): Response
     {
         $elevators = $this->getDoctrine()->getRepository(Elevator::class)->findAll();
-        return $this->render('elevator/index.html.twig', ['elevators' => $elevators]);
+        return $this->render('elevator/index.html.twig', [
+            'elevators' => $elevators
+        ]);
     }
 
     /**
@@ -27,7 +30,10 @@ class ElevatorController extends Controller
      */
     public function orders(): Response
     {
-        return $this->getMockResponse(__METHOD__);
+        $orders = $this->getDoctrine()->getRepository(Order::class)->findAll();
+        return $this->render('elevator/orders.html.twig', [
+            'orders' => $orders,
+        ]);
     }
 
     /**
@@ -35,7 +41,10 @@ class ElevatorController extends Controller
      */
     public function order($from, $to): Response
     {
-        return $this->getMockResponse(__METHOD__, func_get_args() ?? null);
+        $order = new Order($from, $to);
+        $this->getDoctrine()->getManager()->persist($order);
+        $this->getDoctrine()->getManager()->flush();
+        return $this->redirectToRoute('app_elevator_index');
     }
 
     /**
