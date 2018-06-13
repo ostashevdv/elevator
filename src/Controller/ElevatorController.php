@@ -8,6 +8,8 @@ namespace App\Controller;
 
 use App\Entity\Elevator;
 use App\Entity\Order;
+use App\Event\AppEvents;
+use App\Event\Order\OrderCreatedEvent;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -44,6 +46,9 @@ class ElevatorController extends Controller
         $order = new Order($from, $to);
         $this->getDoctrine()->getManager()->persist($order);
         $this->getDoctrine()->getManager()->flush();
+
+        $this->get('event_dispatcher')->dispatch(AppEvents::EVENT_ORDER_CREATED, new OrderCreatedEvent($order));
+
         return $this->redirectToRoute('app_elevator_index');
     }
 
