@@ -11,6 +11,16 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Elevator
 {
+    public const MIN_FLOOR = 1;
+
+    public const MAX_FLOOR = 10;
+
+    public const DIRECTION_UP = 'up';
+
+    public const DIRECTION_DOWN = 'down';
+
+    public const DIRECTION_NONE = 'none';
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -34,7 +44,7 @@ class Elevator
     private $orders;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\ElevatorLog", mappedBy="elevator", orphanRemoval=true)
+     * @ORM\OneToMany(targetEntity="App\Entity\ElevatorLog", mappedBy="elevator", orphanRemoval=true, cascade={"persist"})
      */
     private $elevatorLogs;
 
@@ -133,5 +143,46 @@ class Elevator
         }
 
         return $this;
+    }
+
+    public function move(int $from, int $to)
+    {
+        $this->isMoving = true;
+        $this->moveTo($from);
+        $this->moveTo($to);
+        $this->isMoving = false;
+    }
+
+    public function moveTo(int $floor): void
+    {
+        $distance = $this->getDistance($floor);
+        if ($distance !== 0) {
+            $direction = $this->getDirection($floor);
+
+            $this->currentFloor = $floor;
+            $log = new ElevatorLog($direction, $floor);
+            $this->addElevatorLog($log);
+        }
+    }
+
+    public function getDirection(int $floor): string
+    {
+        if ($this->currentFloor === $floor) {
+            return self::DIRECTION_NONE;
+        }
+        return $this->currentFloor > $floor ? self::DIRECTION_DOWN : self::DIRECTION_UP;
+    }
+
+    public function getDistance(int $floor): int
+    {
+        if ($this->getDirection($floor) === self::DIRECTION_NONE) {
+            return 0;
+        }
+        return abs($this->currentFloor - $floor);
+        /*
+        if ($this->getDirection($floor) === self::DIRECTION_DOWN) {
+            return $this->currentFloor - $floor;
+        }
+        return $floor - $this->currentFloor;*/
     }
 }

@@ -19,6 +19,18 @@ class OrderRepository extends ServiceEntityRepository
         parent::__construct($registry, Order::class);
     }
 
+    /**
+     * @return Order[]
+     */
+    public function findAwaitOrders()
+    {
+        return $this->createQueryBuilder('o')
+            ->andWhere('o.status = :status')
+            ->setParameter('status', Order::STATUS_AWAIT)
+            ->getQuery()
+            ->getResult();
+    }
+
 //    /**
 //     * @return Order[] Returns an array of Order objects
 //     */

@@ -19,6 +19,20 @@ class ElevatorRepository extends ServiceEntityRepository
         parent::__construct($registry, Elevator::class);
     }
 
+    public function findNearlyElevator(int $floor)
+    {
+        $result = $this->createQueryBuilder('e')
+            ->addSelect('abs(e.currentFloor - :floor) as distance')
+            ->setParameter('floor', $floor)
+            ->orderBy('distance', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+        return array_shift($result);
+    }
+
+
+
 //    /**
 //     * @return Elevator[] Returns an array of Elevator objects
 //     */

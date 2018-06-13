@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -17,7 +18,7 @@ class ElevatorLog
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity="App\Entity\Elevator", inversedBy="elevatorLogs")
+     * @ORM\ManyToOne(targetEntity="App\Entity\Elevator", inversedBy="elevatorLogs", cascade={"persist"})
      * @ORM\JoinColumn(nullable=false)
      */
     private $elevator;
@@ -36,6 +37,20 @@ class ElevatorLog
      * @ORM\Column(type="integer")
      */
     private $toStage;
+
+    /**
+     * ElevatorLog constructor.
+     * @param $createdAt
+     * @param $direction
+     * @param $toStage
+     */
+    public function __construct($direction, $toStage)
+    {
+        $this->createdAt = new DateTime();
+        $this->direction = $direction;
+        $this->toStage = $toStage;
+    }
+
 
     public function getId()
     {

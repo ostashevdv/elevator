@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use DateTime;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -29,12 +30,12 @@ class Order
     /**
      * @ORM\Column(type="integer")
      */
-    private $fromStage;
+    private $fromFloor;
 
     /**
      * @ORM\Column(type="integer")
      */
-    private $toStage;
+    private $toFloor;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
@@ -64,51 +65,29 @@ class Order
      */
     public function __construct(int $fromStage, int $toStage, ?\DateTime $createdAt = null)
     {
-        $this->setFromStage($fromStage)
-            ->setToStage($toStage)
-            ->setCreatedAt($createdAt ?? new \DateTime());
+        $this->fromFloor = $fromStage;
+        $this->toFloor = $toStage;
+        $this->createdAt = $createdAt ?? new DateTime();
     }
-
 
     public function getId()
     {
         return $this->id;
     }
 
-    public function getFromStage(): ?int
+    public function getFromFloor(): ?int
     {
-        return $this->fromStage;
+        return $this->fromFloor;
     }
 
-    public function setFromStage(int $fromStage): self
+    public function getToFloor(): ?int
     {
-        $this->fromStage = $fromStage;
-
-        return $this;
-    }
-
-    public function getToStage(): ?int
-    {
-        return $this->toStage;
-    }
-
-    public function setToStage(int $toStage): self
-    {
-        $this->toStage = $toStage;
-
-        return $this;
+        return $this->toFloor;
     }
 
     public function getCompletedAt(): ?\DateTimeInterface
     {
         return $this->completedAt;
-    }
-
-    public function setCompletedAt(\DateTimeInterface $completedAt): self
-    {
-        $this->completedAt = $completedAt;
-
-        return $this;
     }
 
     public function getStatus(): ?string
@@ -130,6 +109,7 @@ class Order
 
     public function setElevator(?Elevator $elevator): self
     {
+        $this->status = self::STATUS_AWAIT;
         $this->elevator = $elevator;
 
         return $this;
@@ -140,10 +120,14 @@ class Order
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
+    public function process(): void
     {
-        $this->createdAt = $createdAt;
-
-        return $this;
+        if (!$this->getElevator()) {
+            throw new \DomainException('На заказ не назначен лифт');
+        }
+        $this->status = self::STATUS_STARTED;
+        $this->getElevator()->move($this->fromFloor, $this->toFloor);
+        $this->status = self::STATUS_FINISHED;
+        $this->completedAt = new DateTime();
     }
 }
