@@ -11,4 +11,6 @@ class AppEvents
     public const EVENT_ORDER_CREATED = 'order.created';
 
     public const EVENT_ORDER_COMPLETED = 'order.completed';
+
+    public const EVENT_ORDER_PROCESS = 'order.process';
 }

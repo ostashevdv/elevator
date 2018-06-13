@@ -7,9 +7,12 @@ namespace App\Controller;
 
 
 use App\Entity\Elevator;
+use App\Entity\ElevatorLog;
 use App\Entity\Order;
 use App\Event\AppEvents;
 use App\Event\Order\OrderCreatedEvent;
+use App\Repository\ElevatorLogRepository;
+use App\Service\ElevatorManager;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -22,19 +25,15 @@ class ElevatorController extends Controller
     public function index(): Response
     {
         $elevators = $this->getDoctrine()->getRepository(Elevator::class)->findAll();
-        return $this->render('elevator/index.html.twig', [
-            'elevators' => $elevators
-        ]);
-    }
+        $orders = $this->getDoctrine()->getRepository(Order::class)->findBy([], ['createdAt' => 'desc', 'completedAt' => 'desc']);
 
-    /**
-     * @Route("/orders")
-     */
-    public function orders(): Response
-    {
-        $orders = $this->getDoctrine()->getRepository(Order::class)->findAll();
-        return $this->render('elevator/orders.html.twig', [
+        /** @var ElevatorLogRepository $logRepository */
+        $logRepository = $this->getDoctrine()->getRepository(ElevatorLog::class);
+
+        return $this->render('elevator/index.html.twig', [
+            'elevators' => $elevators,
             'orders' => $orders,
+            'totalDestination' => $logRepository->totalDestination(),
         ]);
     }
 
@@ -53,19 +52,11 @@ class ElevatorController extends Controller
     }
 
     /**
-     * @Route("/log")
+     * @Route("/process-orders")
      */
-    public function log(): Response
+    public function processOrders(ElevatorManager $manager)
     {
-        return $this->getMockResponse(__METHOD__);
-    }
-
-    private function getMockResponse(string $action, ?array $params = []): Response
-    {
-        if ($params) {
-            dump($params);
-        }
-
-        return new Response("<html><body>{$action}</body></html>");
+        $manager->processOrders();
+        return $this->redirectToRoute('app_elevator_index');
     }
 }

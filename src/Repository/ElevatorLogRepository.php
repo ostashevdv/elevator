@@ -19,6 +19,18 @@ class ElevatorLogRepository extends ServiceEntityRepository
         parent::__construct($registry, ElevatorLog::class);
     }
 
+    public function totalDestination()
+    {
+        $query = $this->getEntityManager()->getConnection()->createQueryBuilder();
+
+        $query->select('elevator_id elevator', 'to_stage floor', 'COUNT(*) count')
+            ->from('elevator_log')
+            ->groupBy('elevator_id', 'to_stage')
+            ->orderBy('elevator', 'asc');
+
+        return $query->execute()->fetchAll();
+    }
+
 //    /**
 //     * @return ElevatorLog[] Returns an array of ElevatorLog objects
 //     */

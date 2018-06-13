@@ -42,18 +42,16 @@ class ElevatorManager
         $this->em->flush();
     }
 
-    public function processOrder(Order $order): void
-    {
-        $order->process();
-        $this->em->persist($order);
-        $this->em->flush();
-    }
-
     public function processOrders(): void
     {
         $orders = $this->orderRepository->findAwaitOrders();
         foreach ($orders as $order) {
-            $this->processOrder($order);
+            $order->process();
+            $this->em->persist($order);
+            $this->em->flush();
+
         }
+
+        //TODO: опустить лифт на первый этаж;
     }
 }

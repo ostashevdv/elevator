@@ -19,6 +19,12 @@ class ElevatorRepository extends ServiceEntityRepository
         parent::__construct($registry, Elevator::class);
     }
 
+    /**
+     * Поиск ближайшего к этажу лифта. (Но надо искать лифт с наимен. заказами)
+     * @param int $floor
+     * @return mixed
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
     public function findNearlyElevator(int $floor)
     {
         $result = $this->createQueryBuilder('e')
@@ -30,7 +36,6 @@ class ElevatorRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
         return array_shift($result);
     }
-
 
 
 //    /**

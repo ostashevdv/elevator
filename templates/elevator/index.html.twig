@@ -1,14 +1,35 @@
 {% extends "base.html.twig" %}
 
 {% block body %}
+
+
+    <!--order create:BEGIN -->
+    <h2>Добавить заказ на лифт: </h2>
+    <div class="form-order">
+        <div class="form-group">
+            <select class="form-control" id="order">
+                {% for from in range(1, 10) %}
+                    {% for to in range(1, 10) %}
+                        <option value="{{ path('app_elevator_order', {'from': from, 'to': to }) }}">
+                            C {{ from }} на {{ to }} Этаж
+                        </option>
+
+                    {% endfor %}
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary order-create">Submit</button>
+    </div>
+    <!--/order create:END!-->
+
     <!--elevator list:BEGIN-->
     <h2>Состояние лифтов: </h2>
     <table class="table table-sm">
         <thead>
         <tr>
             <th scope="col">#</th>
-            <th scope="col">Статус</th>
             <th scope="col">Этаж</th>
+            <th scope="col">Статус</th>
         </tr>
         </thead>
         <tbody>
@@ -21,11 +42,67 @@
 
             <tr class="{{ class | join }}">
                 <th scope="row">{{ elevator.id }}</th>
-                <td>{{ elevator.isMoving }}</td>
                 <td>{{ elevator.currentFloor }}</td>
+                <td>{{ elevator.isMoving ? 'Занят' : 'Свободен' }}</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
     <!--/elevator list:END-->
+
+
+    <!--orders list:BEGIN-->
+    <h2>Список заказов: </h2>
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th scope="col">Заказ #</th>
+            <th scope="col">C этажа</th>
+            <th scope="col">На этаж</th>
+            <th scope="col">Создан</th>
+            <th scope="col">Статус</th>
+            <th scope="col">Выполнен</th>
+            <th scope="col">Лифт</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for i, order in orders %}
+
+            <tr>
+                <th scope="row">{{ order.id }}</th>
+                <td>{{ order.fromFloor }}</td>
+                <td>{{ order.toFloor }}</td>
+                <td>{{ order.createdAt | date }}</td>
+                <td>{{ order.status }}</td>
+                <td>{{ order.completedAt ? order.completedAt | date : null }}</td>
+                <td>{{ order.elevator.id }}</td>
+            </tr>
+
+        {% endfor %}
+        </tbody>
+    </table>
+    <!--/orders list:END-->
+
+
+    <h2>Статистика прибытия лифта на этаж:</h2>
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th scope="col">Лифт</th>
+            <th scope="col">Этаж</th>
+            <th scope="col">Кол-во</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for stat in totalDestination %}
+
+            <tr>
+                <td>{{ stat.elevator }}</td>
+                <td>{{ stat.floor }}</td>
+                <td>{{ stat.count }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
 {% endblock %}
